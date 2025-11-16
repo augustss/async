@@ -26,14 +26,17 @@ jobs:
     # must be installed before any other packages since there is an implicit dependency on ghc-compat
     - name: compile and install ghc-compat package
       run: |
+        PATH="$HOME/.mcabal/bin:$PATH"
         mcabal install ghc-compat
 
     # unordered-containers
     # not merged and uploaded to hackage
     - name: compile and install unordered-containers package
       run: |
+        PATH="$HOME/.mcabal/bin:$PATH"
         mcabal install --git=http://github.com/augustss/unordered-containers.git unordered-containers
 
+    # async
     - name: checkout async repo
       uses: actions/checkout@v4
       with:
