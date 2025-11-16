@@ -1,0 +1,49 @@
+name: mhs-ci
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build-mhs-async:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: checkout mhs repo
+      uses: actions/checkout@v4
+      with:
+        repository: augustss/MicroHs
+        ref: v0.14.23.1
+        path: mhs
+    - name: make and install mhs
+      run: |
+        cd mhs
+        make minstall
+
+    # ghc-compat
+    # must be installed before any other packages since there is an implicit dependency on ghc-compat
+    - name: compile and install ghc-compat package
+      run: |
+        mcabal install ghc-compat
+
+    # unordered-containers
+    # not merged and uploaded to hackage
+    - name: compile and install unordered-containers package
+      run: |
+        mcabal install --git=http://github.com/augustss/unordered-containers.git unordered-containers
+
+    - name: checkout async repo
+      uses: actions/checkout@v4
+      with:
+        path: async
+    - name: compile and install async package
+      run: |
+        PATH="$HOME/.mcabal/bin:$PATH"
+        cd async
+        mcabal install
+
+    - name: cleanup
+      run: |
+        rm -rf $HOME/.mcabal
